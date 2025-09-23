@@ -14,7 +14,6 @@ export class UserService {
     if (user) {
       throw new BadRequestException('Email already exists');
     }
-    await this.userRepository.create(data);
-    return 'User created successfully';
+    return await this.userRepository.create(data);
   }
 }
