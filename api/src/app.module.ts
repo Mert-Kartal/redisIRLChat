@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { JwtModule } from './jwt/jwt.module';
 import { ConfigModule } from '@nestjs/config';
 import { SharedModule } from './shared/shared.module';
+import { RedisModule } from './redis/redis.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -17,6 +18,7 @@ import { SharedModule } from './shared/shared.module';
     AuthModule,
     JwtModule,
     SharedModule,
+    RedisModule,
   ],
   controllers: [AppController],
   providers: [AppService],
