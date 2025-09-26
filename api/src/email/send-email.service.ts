@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 import { ConfigService } from '@nestjs/config';
-
+import { EmailJobData } from './email.dto';
 @Injectable()
-export class EmailService {
+export class SendEmailService {
   private readonly transporter: nodemailer.Transporter;
   constructor(private readonly configService: ConfigService) {
     this.transporter = nodemailer.createTransport({
@@ -14,14 +14,17 @@ export class EmailService {
         user: this.configService.get('EMAIL_USER') as string,
         pass: this.configService.get('EMAIL_PASS') as string,
       },
+      tls: {
+        rejectUnauthorized: false,
+      },
     });
   }
-  async sendEmail(to: string, subject: string, text: string) {
+  async sendEmail(data: EmailJobData) {
     const mailOptions = {
       from: this.configService.get('EMAIL_FROM') as string,
-      to,
-      subject,
-      text,
+      to: data.to,
+      subject: data.subject,
+      html: data.html,
     };
     try {
       await this.transporter.sendMail(mailOptions);

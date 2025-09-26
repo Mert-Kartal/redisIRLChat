@@ -8,6 +8,8 @@ import { JwtModule } from './jwt/jwt.module';
 import { ConfigModule } from '@nestjs/config';
 import { SharedModule } from './shared/shared.module';
 import { RedisModule } from './redis/redis.module';
+import { BullmqModule } from './bullmq/bullmq.module';
+import { EmailModule } from './email/email.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -19,6 +21,8 @@ import { RedisModule } from './redis/redis.module';
     JwtModule,
     SharedModule,
     RedisModule,
+    BullmqModule,
+    EmailModule,
   ],
   controllers: [AppController],
   providers: [AppService],

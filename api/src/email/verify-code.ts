@@ -24,7 +24,7 @@ body { font-family: Arial, sans-serif; }
       <p>Eğer bu e-postayı siz istemediyseniz, lütfen dikkate almayın.</p>
     </div>
     <div class="footer">
-      <p>&copy; {{CURRENT_YEAR}} ChatApp. Tüm hakları saklıdır.</p>
+      <p>&copy; {{CURRENT_YEAR}} RedisIRLChat. Tüm hakları saklıdır.</p>
     </div>
   </div>
 </body>
