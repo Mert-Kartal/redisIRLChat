@@ -4,7 +4,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { UserService } from '../user/user.service';
-import { LoginDto, RegisterDto } from './auth.dto';
+import { LoginDto, RegisterDto, VerifyCodeDto } from './auth.dto';
 import * as argon2 from 'argon2';
 import { JwtService } from '../jwt/jwt.service';
 import { RedisService } from '../redis/redis.service';
@@ -53,6 +53,25 @@ export class AuthService {
       console.log(error);
       throw new BadRequestException('Failed to register');
     }
+  }
+  async verifyCode(data: VerifyCodeDto) {
+    const tempUser = await this.redisService
+      .getClient()
+      .hgetall('user:' + data.email);
+    if (!tempUser || +tempUser.code !== data.code) {
+      throw new BadRequestException('Invalid code');
+    }
+    const user = await this.userService.add({
+      email: tempUser.email,
+      name: tempUser.name,
+      password: tempUser.password,
+    });
+    const { accessToken, refreshToken } = await this.jwtService.generateToken({
+      userId: user.id,
+      role: user.role,
+    });
+    await this.redisService.getClient().del('user:' + data.email);
+    return { accessToken, refreshToken };
   }
   async login(data: LoginDto) {
     const user = await this.userService.checkEmail(data.email);
