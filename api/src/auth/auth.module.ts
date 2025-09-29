@@ -8,9 +8,10 @@ import { EmailModule } from '../email/email.module';
 import { AccountService } from './account/account.service';
 import { AccountRepository } from './account/account.repository';
 import { PrismaModule } from '../prisma/prisma.module';
+import { GoogleStrategy } from './strategy/google.strategy';
 @Module({
   imports: [UserModule, JwtModule, RedisModule, EmailModule, PrismaModule],
-  providers: [AuthService, AccountService, AccountRepository],
+  providers: [AuthService, AccountService, AccountRepository, GoogleStrategy],
   controllers: [AuthController],
 })
 export class AuthModule {}
