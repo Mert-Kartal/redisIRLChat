@@ -6,7 +6,11 @@ import { CreateUserDto } from './user.dto';
 export class UserRepository {
   constructor(private readonly prisma: PrismaService) {}
   async create(data: CreateUserDto) {
-    return this.prisma.user.create({ data });
+    return this.prisma.user.upsert({
+      where: { email: data.email },
+      update: data,
+      create: data,
+    });
   }
   async search(email: string) {
     return this.prisma.user.findUnique({ where: { email } });

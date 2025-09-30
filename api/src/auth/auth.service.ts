@@ -22,7 +22,7 @@ export class AuthService {
   async register(data: RegisterDto) {
     const hashedPassword = await argon2.hash(data.password);
     const code = Math.floor(100000 + Math.random() * 900000);
-    const expires_in_minutes = 15; // Redis'teki süre ile uyumlu
+    const expires_in_minutes = 15;
     const current_year = new Date().getFullYear();
     const htmlContent = VERIFICATION_CODE_HTML_TEMPLATE.replace(
       '{{VERIFICATION_CODE}}',
@@ -33,7 +33,7 @@ export class AuthService {
 
     try {
       const user = await this.userService.checkEmail(data.email);
-      if (user) {
+      if (user && user.password) {
         throw new BadRequestException('Email already exists');
       }
       await this.redisService.getClient().hmset('user:' + data.email, {
