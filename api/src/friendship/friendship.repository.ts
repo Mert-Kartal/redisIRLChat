@@ -23,7 +23,7 @@ export class FriendshipRepository {
   }
   async getIncomingRequests(receiverId: string) {
     return this.prisma.friendship.findMany({
-      where: { receiverId, status: 'PENDING' },
+      where: { receiverId, status: FriendshipStatus.PENDING },
       include: {
         Requester: {
           select: {
@@ -39,7 +39,7 @@ export class FriendshipRepository {
   }
   async getOutgoingRequests(requesterId: string) {
     return this.prisma.friendship.findMany({
-      where: { requesterId, status: 'PENDING' },
+      where: { requesterId, status: FriendshipStatus.PENDING },
       include: {
         Receiver: {
           select: {
@@ -57,7 +57,7 @@ export class FriendshipRepository {
     return this.prisma.friendship.findMany({
       where: {
         OR: [{ requesterId: userId }, { receiverId: userId }],
-        status: 'ACCEPTED',
+        status: FriendshipStatus.ACCEPTED,
       },
       include: {
         Requester: {

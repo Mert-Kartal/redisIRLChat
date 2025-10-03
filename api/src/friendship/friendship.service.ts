@@ -5,6 +5,7 @@ import { EmailProducerService } from '../email/email-producer.service';
 import { FRIEND_REQUEST_HTML_TEMPLATE } from './friend-request';
 import { FriendshipStatus } from '@prisma/client';
 import { FriendshipDto } from './friendship.dto';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 @Injectable()
 export class FriendshipService {
@@ -34,7 +35,16 @@ export class FriendshipService {
     if (!requester || !receiver) {
       throw new BadRequestException('User not found');
     }
-    await this.friendshipRepository.create({ requesterId, receiverId });
+    try {
+      await this.friendshipRepository.create({ requesterId, receiverId });
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        if (error.code === 'P2002') {
+          throw new BadRequestException('Friendship already exists');
+        }
+        throw new BadRequestException('Failed to create friendship');
+      }
+    }
 
     const current_year = new Date().getFullYear();
     const htmlContent = FRIEND_REQUEST_HTML_TEMPLATE.replace(
@@ -42,12 +52,17 @@ export class FriendshipService {
       requester.email,
     ).replace('{{CURRENT_YEAR}}', current_year.toString());
 
-    await this.emailProducerService.addEmailJob({
-      to: receiver.email,
-      subject: 'Friendship Request',
-      html: htmlContent,
-    });
-    return 'Friendship request sent';
+    await this.emailProducerService
+      .addEmailJob({
+        to: receiver.email,
+        subject: 'Friendship Request',
+        html: htmlContent,
+      })
+      .catch((error) => {
+        console.log(error);
+        throw new BadRequestException('Failed to send email');
+      });
+    return { message: 'Friendship request sent' };
   }
   async listIncomingRequests(userId: string) {
     return await this.friendshipRepository.getIncomingRequests(userId);
@@ -60,7 +75,6 @@ export class FriendshipService {
   }
   async acceptRequest(data: FriendshipDto) {
     const { requesterId, receiverId } = data;
-    console.log(requesterId, receiverId);
     const checkFriendship = await this.friendshipRepository.show({
       requesterId,
       receiverId,
@@ -72,7 +86,7 @@ export class FriendshipService {
       throw new BadRequestException('Request not pending');
     }
     await this.friendshipRepository.acceptRequest({ requesterId, receiverId });
-    return 'Friendship accepted';
+    return { message: 'Friendship accepted' };
   }
   async remove(user1Id: string, user2Id: string) {
     const friendship = await this.friendshipRepository.show({
