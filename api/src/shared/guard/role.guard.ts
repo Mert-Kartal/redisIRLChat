@@ -3,7 +3,7 @@ import { Observable } from 'rxjs';
 import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
 import { Roles } from '../decorator/roles.decorator';
-import { JwtPayload } from '../interfaces/jwt-payload';
+import { JwtPayload } from '../types/express';
 import { Role } from '@prisma/client';
 
 @Injectable()

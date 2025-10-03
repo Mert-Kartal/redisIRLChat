@@ -12,4 +12,7 @@ export class UserService {
   async add(data: CreateUserDto) {
     return await this.userRepository.create(data);
   }
+  async show(id: string) {
+    return await this.userRepository.show(id);
+  }
 }

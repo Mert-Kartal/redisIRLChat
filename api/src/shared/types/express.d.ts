@@ -6,7 +6,9 @@ export interface JwtPayload {
 }
 
 declare global {
-  interface Request {
-    user: JwtPayload;
+  namespace Express {
+    interface Request {
+      user: JwtPayload;
+    }
   }
 }
