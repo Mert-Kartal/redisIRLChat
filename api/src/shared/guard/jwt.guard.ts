@@ -8,6 +8,7 @@ import { Observable } from 'rxjs';
 import { JwtService } from '../../jwt/jwt.service';
 import { ConfigService } from '@nestjs/config';
 import { Request } from 'express';
+import { JwtPayload } from '../types/express';
 @Injectable()
 export class JwtGuard implements CanActivate {
   constructor(
@@ -27,7 +28,7 @@ export class JwtGuard implements CanActivate {
         header,
         this.configService.get('JWT_ACCESS_SECRET') as string,
       );
-      request.user = token;
+      request.user = token as JwtPayload;
       return true;
     } catch (error) {
       console.log(error);
